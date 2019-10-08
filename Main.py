@@ -71,33 +71,37 @@ def afficherGroupesPossibles(listePossibilite, listeInt):
 
 def uneSolution(repartition, listeInt, solution, listeSolutions):
 
-	if(len(repartition) == 0):
-		if(estDoublon(solution,listeSolutions) == False):
-			listeSolutions.append(solution)    # Compte le nb de solutions trouvees
+    if(len(repartition) == 0):
+        if(estDoublon(solution,listeSolutions) == False):
+            listeSolutions.append(solution)    # Compte le nb de solutions trouvees
 
-	else :
-		tailleGroupe = repartition[0]
-		allSet = []
+    else :
+        tailleGroupe = repartition[0]
+        allSet = []
 
-		for s in list(powerset(listeInt)):
-			if(len(s) == tailleGroupe):
-				allSet.append(s)
+        for s in list(powerset(listeInt)):
+            if(len(s) == tailleGroupe):
+                allSet.append(s)
+
+        diviseur = 0
+        if(repartition[0] == 2):
+            diviseur = repartition.count(tailleGroupe)
+        else :
+            diviseur = 1
+
+        for k in range(len(allSet)//diviseur):
+            possibiliteSet = allSet[k]
+            solutionTemp = list(solution)
+            solutionTemp.append(possibiliteSet)
+            listeTemp = list(listeInt)
                 
-		diviseur = repartition.count(tailleGroupe)
+            for i in range(tailleGroupe):
+                listeTemp.remove(allSet[k][i])
 
-		for k in range(len(allSet)//diviseur):
-			possibiliteSet = allSet[k]
-			solutionTemp = list(solution)
-			solutionTemp.append(possibiliteSet)
-			listeTemp = list(listeInt)
-                
-			for i in range(tailleGroupe):
-				listeTemp.remove(allSet[k][i])
+            newRepartition = list(repartition)
+            del newRepartition[0]
 
-			newRepartition = list(repartition)
-			del newRepartition[0]
-
-			uneSolution(newRepartition, listeTemp, solutionTemp, listeSolutions)
+            uneSolution(newRepartition, listeTemp, solutionTemp, listeSolutions)
 
 
 def estDoublon(solution, listeSolutions):
@@ -122,7 +126,7 @@ def estDoublon(solution, listeSolutions):
 			i += 1
 
 		if(nb == len(solution)):
-			print(solution,"=",solutionTest)
+			#print(solution,"=",solutionTest)
 			return True
 
 	return False
@@ -132,7 +136,7 @@ def estDoublon(solution, listeSolutions):
 #### Programme principale ####
 start_time=time.time()
 
-n = 8
+n = 11
 
 repartitionPossibles = toutesLesRepartitions(n)
 
