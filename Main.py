@@ -55,6 +55,7 @@ def afficherGroupesPossibles(listePossibilite, listeInt):
         uneSolution(repartition, listeInt, solution, listeSolutions)
         nbRep += len(listeSolutions)
         
+        
         for i in range(0,len(listeSolutions),3):
         	if(len(listeSolutions) > i+2):
         		print(listeSolutions[i], "   ", listeSolutions[i+1], "   ", listeSolutions[i+2])
@@ -64,6 +65,7 @@ def afficherGroupesPossibles(listePossibilite, listeInt):
 
         	else:
         		print(listeSolutions[i])
+        
 
         
 
@@ -84,7 +86,7 @@ def uneSolution(repartition, listeInt, solution, listeSolutions):
                 allSet.append(s)
 
         diviseur = 0
-        if(repartition[0] == 2):
+        if(tailleGroupe == 2):
             diviseur = repartition.count(tailleGroupe)
         else :
             diviseur = 1
@@ -136,7 +138,7 @@ def estDoublon(solution, listeSolutions):
 #### Programme principale ####
 start_time=time.time()
 
-n = 11
+n = int(input("n : "))
 
 repartitionPossibles = toutesLesRepartitions(n)
 
@@ -151,4 +153,14 @@ for i in range(1,n+1):
 
 afficherGroupesPossibles(repartitionPossibles, listeInt)
 
+"""
+listePowerSet = []
+
+for k in list(powerset(listeInt)):
+    if(len(k)==3):
+        listePowerSet.append(k)
+
+for s in range(len(listePowerSet)//(n//3)):
+    print(listePowerSet[s])
+"""
 print("Temps d execution : %s secondes" % (time.time() - start_time))
