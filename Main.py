@@ -1,5 +1,6 @@
 from itertools import chain, combinations
 import time
+import random
 
 #### Fonctions ####
 
@@ -46,32 +47,27 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
-def afficherGroupesPossibles(listePossibilite, listeInt):
+def afficherGroupesPossibles(listePossibilite, listeEleve, notesAttribuees):
     nbRep = 0
+    listeSolutionsAvecNotes = dict()
 
     for repartition in listePossibilite:
         solution = []
         listeSolutions = []
-        uneSolution(repartition, listeInt, solution, listeSolutions)
+        uneSolution(repartition, listeEleve, solution, listeSolutions)
+
+        for possibilite in listeSolutions:
+            listeSolutionsAvecNotes[str(possibilite)] = notePossibilite(possibilite, listeEleve, notesAttribuees)
+
+
         nbRep += len(listeSolutions)
         
-        
-        for i in range(0,len(listeSolutions),3):
-        	if(len(listeSolutions) > i+2):
-        		print(listeSolutions[i], "   ", listeSolutions[i+1], "   ", listeSolutions[i+2])
-
-        	elif(len(listeSolutions) > i+1):
-        		print(listeSolutions[i], "   ", listeSolutions[i+1])
-
-        	else:
-        		print(listeSolutions[i])
-        
-
-        
+    for possibilite, note in listeSolutionsAvecNotes.items():
+        print("{}, note de la repartition : {}".format(possibilite, note))
 
     print(nbRep,"possibilites")
 
-def uneSolution(repartition, listeInt, solution, listeSolutions):
+def uneSolution(repartition, listeEleve, solution, listeSolutions):
 
     if(len(repartition) == 0):
         if(estDoublon(solution,listeSolutions) == False):
@@ -81,7 +77,7 @@ def uneSolution(repartition, listeInt, solution, listeSolutions):
         tailleGroupe = repartition[0]
         allSet = []
 
-        for s in list(powerset(listeInt)):
+        for s in list(powerset(listeEleve)):
             if(len(s) == tailleGroupe):
                 allSet.append(s)
 
@@ -95,7 +91,7 @@ def uneSolution(repartition, listeInt, solution, listeSolutions):
             possibiliteSet = allSet[k]
             solutionTemp = list(solution)
             solutionTemp.append(possibiliteSet)
-            listeTemp = list(listeInt)
+            listeTemp = list(listeEleve)
                 
             for i in range(tailleGroupe):
                 listeTemp.remove(allSet[k][i])
@@ -133,9 +129,47 @@ def estDoublon(solution, listeSolutions):
 
 	return False
 
+def notePossibilite(possibilite, listeEleve, notesAttribuees):
+    medianeGroupe = []
+    for groupe in possibilite:
+        notesGroupe = []
+        for eleve1 in groupe:
+            for eleve2 in groupe:
+                note = notesAttribuees[listeEleve.index(eleve1)][listeEleve.index(eleve2)]
+                if(not note == "-"):
+                    notesGroupe.append(note)
+
+        if("AR" in notesGroupe):
+            medianeGroupe.append("AR")
+        elif("I" in notesGroupe):
+            medianeGroupe.append("I")
+        elif("P" in notesGroupe):
+            medianeGroupe.append("P")
+        elif("AB" in notesGroupe):
+            medianeGroupe.append("AB")
+        elif("B" in notesGroupe):
+            medianeGroupe.append("B")
+        elif("TB" in notesGroupe):
+            medianeGroupe.append("TB")
+    
+    if("AR" in medianeGroupe):
+        return "AR"
+    elif("I" in medianeGroupe):
+        return "I"
+    elif("P" in medianeGroupe):
+        return "P"
+    elif("AB" in medianeGroupe):
+        return "AB"
+    elif("B" in medianeGroupe):
+        return "B"
+    elif("TB" in medianeGroupe):
+        return "TB"
+
+
 
 
 #### Programme principale ####
+
 start_time=time.time()
 
 n = int(input("n : "))
@@ -145,22 +179,32 @@ repartitionPossibles = toutesLesRepartitions(n)
 #for repartition in repartitionPossibles:
 #    print(repartition)
 
-listeInt = []
-for i in range(1,n+1):
-    listeInt.append(i)
+listeEleve = []
+for i in range(65,n+65):
+    listeEleve.append(chr(i))
 
-#print(list(powerset(listeInt)))
+listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
 
-afficherGroupesPossibles(repartitionPossibles, listeInt)
+### Simulation des notes attibuees ###
+notesAttribuees = []
 
-"""
-listePowerSet = []
+for i in range(n):
+    notes = []
+    for j in range(n):
+        if(i == j):
+            notes.append("-")
+        else :
+            notes.append(listeNotes[random.randint(0,len(listeNotes)-1)])
+    notesAttribuees.append(notes)
 
-for k in list(powerset(listeInt)):
-    if(len(k)==3):
-        listePowerSet.append(k)
+print("### Notes attribuées ###")
+print()
+for i in notesAttribuees:
+    print(i)
 
-for s in range(len(listePowerSet)//(n//3)):
-    print(listePowerSet[s])
-"""
+print()
+
+afficherGroupesPossibles(repartitionPossibles, listeEleve, notesAttribuees)
+
+
 print("Temps d execution : %s secondes" % (time.time() - start_time))
