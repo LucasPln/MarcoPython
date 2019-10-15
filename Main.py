@@ -64,8 +64,8 @@ def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
 
     meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
 
-    print("Meilleure note trouvée :",meilleurNote)
-    print("Liste des possibilités ayant cette note : ")
+    print("Meilleure note trouvee :",meilleurNote)
+    print("Liste des possibilites ayant cette note : ")
     for possibilite, note in listeSolutionsAvecNotes.items():
         if(note == meilleurNote):
            print("{}, note de la repartition : {}".format(possibilite, note))
@@ -223,7 +223,7 @@ for i in range(n):
     notesAttribuees.append(notes)
 
 print()
-print("### Notes attribuées ###")
+print("### Notes attribuees ###")
 for i in notesAttribuees:
     print(i)
 
