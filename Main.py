@@ -47,7 +47,7 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
-def afficherGroupesPossibles(listePossibilite, listeEleve, notesAttribuees):
+def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
     nbRep = 0
     listeSolutionsAvecNotes = dict()
 
@@ -61,11 +61,17 @@ def afficherGroupesPossibles(listePossibilite, listeEleve, notesAttribuees):
 
 
         nbRep += len(listeSolutions)
-        
-    for possibilite, note in listeSolutionsAvecNotes.items():
-        print("{}, note de la repartition : {}".format(possibilite, note))
 
-    print(nbRep,"possibilites")
+    meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
+
+    print("Meilleure note trouvée :",meilleurNote)
+    print("Liste des possibilités ayant cette note : ")
+    for possibilite, note in listeSolutionsAvecNotes.items():
+        if(note == meilleurNote):
+           print("{}, note de la repartition : {}".format(possibilite, note))
+
+    print()
+    print(nbRep,"possibilites au total")
 
 def uneSolution(repartition, listeEleve, solution, listeSolutions):
 
@@ -166,6 +172,25 @@ def notePossibilite(possibilite, listeEleve, notesAttribuees):
         return "TB"
 
 
+def meilleureNoteDesPossibilites(listeSolutionsAvecNotes):
+    if("TB" in listeSolutionsAvecNotes.values()):
+        return "TB"
+
+    elif("B" in listeSolutionsAvecNotes.values()):
+        return "B"
+
+    elif("AB" in listeSolutionsAvecNotes.values()):
+        return "AB"
+
+    elif("P" in listeSolutionsAvecNotes.values()):
+        return "P"
+
+    elif("I" in listeSolutionsAvecNotes.values()):
+        return "I"
+
+    elif("AR" in listeSolutionsAvecNotes.values()):
+        return "AR"
+
 
 
 #### Programme principale ####
@@ -197,14 +222,14 @@ for i in range(n):
             notes.append(listeNotes[random.randint(0,len(listeNotes)-1)])
     notesAttribuees.append(notes)
 
-print("### Notes attribuées ###")
 print()
+print("### Notes attribuées ###")
 for i in notesAttribuees:
     print(i)
 
 print()
 
-afficherGroupesPossibles(repartitionPossibles, listeEleve, notesAttribuees)
+afficherMeilleurGroupes(repartitionPossibles, listeEleve, notesAttribuees)
 
 
 print("Temps d execution : %s secondes" % (time.time() - start_time))
