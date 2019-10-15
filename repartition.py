@@ -47,7 +47,7 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
-def afficherMeilleurGroupes(listeRepartition, listeEleve):
+def afficherRepartition(listeRepartition, listeEleve):
     nbRep = 0
     listeSolutionsAvecNotes = dict()
 
@@ -148,7 +148,7 @@ for i in range(65,n+65):
 
 
 
-afficherMeilleurGroupes(repartitionPossibles, listeEleve)
+afficherRepartition(repartitionPossibles, listeEleve)
 
 
 print("Temps d execution : %s secondes" % (time.time() - start_time))
