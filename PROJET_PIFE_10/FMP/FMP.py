@@ -1,6 +1,8 @@
 from itertools import chain, combinations
 import time
 import random
+import sys
+import csv
 
 #### Fonctions ####
 
@@ -64,11 +66,14 @@ def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
 
     meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
 
-    print("Meilleure note trouvee :",meilleurNote)
-    print("Liste des possibilites ayant cette note : ")
+    print("Meilleure note trouvée :",meilleurNote)
+    print("Liste des possibilités ayant cette note : ")
     for possibilite, note in listeSolutionsAvecNotes.items():
         if(note == meilleurNote):
-           print("{}, note de la repartition : {}".format(possibilite, note))
+            with open('FMP.csv', 'a', newline='') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                spamwriter.writerow(possibilite)
+            print("{}, note de la repartition : {}".format(possibilite, note))
 
     print()
     print(nbRep,"possibilites au total")
@@ -195,35 +200,55 @@ def meilleureNoteDesPossibilites(listeSolutionsAvecNotes):
 
 #### Programme principale ####
 
-start_time=time.time()
-
+start_time = time.time()
 n = int(input("n : "))
+"""
+ext = ""
+
+nlimit = -1
+
+argument = "reel"
+
+for arg in sys.argv:
+    print(arg)
+    # Remove the "-" to just keep what is behind
+    if arg == "-a" or arg == "--all":
+        argument = "exhaustif"
+    elif arg == "-r" or arg == "--real":
+        argument = "reel"
+    elif arg.find("--ext=") != -1:
+        ext = arg[6:]
+    elif arg.find("--number=") != -1:
+        nlimit = int(arg[9:])
+"""
 
 repartitionPossibles = toutesLesRepartitions(n)
 
-#for repartition in repartitionPossibles:
-#    print(repartition)
-
 listeEleve = []
-for i in range(65,n+65):
-    listeEleve.append(chr(i))
 
 listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
 
-### Simulation des notes attibuees ###
 notesAttribuees = []
 
-for i in range(n):
-    notes = []
-    for j in range(n):
-        if(i == j):
-            notes.append("-")
-        else :
-            notes.append(listeNotes[random.randint(0,len(listeNotes)-1)])
-    notesAttribuees.append(notes)
+with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
+	spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+	i = 0
+	while(i <= n):
+
+		row = next(spamreader)
+		if(i != 0):
+			notes = []
+			liste = row[0].split(",")
+			for k in range(n+1):
+				if(k == 0):
+					listeEleve.append("e"+str(i))
+				else:
+					notes.append(liste[k])
+			notesAttribuees.append(notes)
+		i += 1
 
 print()
-print("### Notes attribuees ###")
+print("### Notes attribuées ###")
 for i in notesAttribuees:
     print(i)
 
