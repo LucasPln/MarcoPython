@@ -3,7 +3,7 @@ import time
 import random
 import sys
 import csv
-
+import os
 #### Fonctions ####
 
 def toutesLesRepartitions(n):
@@ -66,17 +66,21 @@ def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
 
     meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
 
-    print("Meilleure note trouvée :",meilleurNote)
-    print("Liste des possibilités ayant cette note : ")
+
     for possibilite, note in listeSolutionsAvecNotes.items():
         if(note == meilleurNote):
-            with open('FMP.csv', 'a', newline='') as csvfile:
-                spamwriter = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                spamwriter.writerow(possibilite)
-            print("{}, note de la repartition : {}".format(possibilite, note))
+            resultat = "{}, note de la repartition : {}".format(possibilite, note)  
+            f = open("FMP.csv", "a")
+            writer = csv.DictWriter(f, fieldnames=[resultat])
+            writer.writeheader()
+            f.close()             
+            
+            
 
-    print()
-    print(nbRep,"possibilites au total")
+ 
+            
+
+
 
 def uneSolution(repartition, listeEleve, solution, listeSolutions):
 
@@ -114,31 +118,31 @@ def uneSolution(repartition, listeEleve, solution, listeSolutions):
 
 
 def estDoublon(solution, listeSolutions):
-	if(len(listeSolutions) == 0):
-		return False
+    if(len(listeSolutions) == 0):
+        return False
 
-	for solutionTest in listeSolutions:
+    for solutionTest in listeSolutions:
 
-		nb = 0
+        nb = 0
 
-		i = 0
-		while(i < len(solution)):
-			trouveCorres = False
-			for groupeSolTest in solutionTest:
-				if(solution[i] == groupeSolTest):
-					nb += 1
-					trouveCorres = True
+        i = 0
+        while(i < len(solution)):
+            trouveCorres = False
+            for groupeSolTest in solutionTest:
+                if(solution[i] == groupeSolTest):
+                    nb += 1
+                    trouveCorres = True
 
-			if(trouveCorres == False):
-				break
+            if(trouveCorres == False):
+                break
 
-			i += 1
+            i += 1
 
-		if(nb == len(solution)):
-			#print(solution,"=",solutionTest)
-			return True
+        if(nb == len(solution)):
 
-	return False
+            return True
+
+    return False
 
 def notePossibilite(possibilite, listeEleve, notesAttribuees):
     medianeGroupe = []
@@ -201,28 +205,9 @@ def meilleureNoteDesPossibilites(listeSolutionsAvecNotes):
 #### Programme principale ####
 
 start_time = time.time()
-n = int(input("n : "))
-"""
-ext = ""
 
-nlimit = -1
 
-argument = "reel"
 
-for arg in sys.argv:
-    print(arg)
-    # Remove the "-" to just keep what is behind
-    if arg == "-a" or arg == "--all":
-        argument = "exhaustif"
-    elif arg == "-r" or arg == "--real":
-        argument = "reel"
-    elif arg.find("--ext=") != -1:
-        ext = arg[6:]
-    elif arg.find("--number=") != -1:
-        nlimit = int(arg[9:])
-"""
-
-repartitionPossibles = toutesLesRepartitions(n)
 
 listeEleve = []
 
@@ -230,22 +215,28 @@ listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
 
 notesAttribuees = []
 
-with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
-	spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-	i = 0
-	while(i <= n):
+list2 = []
 
-		row = next(spamreader)
-		if(i != 0):
-			notes = []
-			liste = row[0].split(",")
-			for k in range(n+1):
-				if(k == 0):
-					listeEleve.append("e"+str(i))
-				else:
-					notes.append(liste[k])
-			notesAttribuees.append(notes)
-		i += 1
+
+    
+with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    i = 0
+    row = next(spamreader)
+    n=(len(row[0].split(","))-1)
+    repartitionPossibles = toutesLesRepartitions(n)
+    while(i <= n):
+        if(i != 0):
+            row = next(spamreader)
+            notes = []
+            liste = row[0].split(",")
+            for k in range(n+1):
+                if(k == 0):
+                    listeEleve.append("e"+str(i))
+                else:
+                    notes.append(liste[k])
+            notesAttribuees.append(notes)
+        i += 1
 
 print()
 print("### Notes attribuées ###")
@@ -254,7 +245,10 @@ for i in notesAttribuees:
 
 print()
 
+
+
+
 afficherMeilleurGroupes(repartitionPossibles, listeEleve, notesAttribuees)
 
 
-print("Temps d execution : %s secondes" % (time.time() - start_time))
+
