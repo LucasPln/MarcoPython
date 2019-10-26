@@ -188,7 +188,6 @@ listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
 
 notesAttribuees = []
 
-list2 = []
 TAB_ETUDIANTS = []
 
 with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
@@ -197,8 +196,10 @@ with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
     row = next(spamreader)
     TAB_ETUDIANTS = row[0].split(",")
     n = (len(row[0].split(",")) - 1)
-    if (n > 12):
-        n = 12
+
+    if (n > 10):
+        n = 10
+        
     repartitionPossibles = toutesLesRepartitions(n)
     while(i <= n):
         if (i != 0):
