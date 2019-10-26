@@ -1,12 +1,17 @@
 from itertools import chain, combinations
+from collections import OrderedDict
+from functools import reduce
 import time
 import random
 import sys
 import csv
 import os
+
 #### Fonctions ####
 
+
 def toutesLesRepartitions(n):
+
     listePossibilite = []
     nb2 = n//2
     reste = n - (2 * nb2)
@@ -40,55 +45,56 @@ def toutesLesRepartitions(n):
             somme = 2*nb2 + 3*nb3
 
         nb2 = nb2 - 1
-
     return listePossibilite
-    
-    
+
 
 def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
-def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
-    nbRep = 0
-    listeSolutionsAvecNotes = dict()
 
+def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
+
+    listeSolutionsAvecNotes = dict()
+    dictResultat = dict()
     for repartition in listePossibilite:
         solution = []
         listeSolutions = []
         uneSolution(repartition, listeEleve, solution, listeSolutions)
-
+        # mettre toutes les possibilités dans un dictionnaire avec la clé unique pour chaque énumeration
         for possibilite in listeSolutions:
-            listeSolutionsAvecNotes[str(possibilite)] = notePossibilite(possibilite, listeEleve, notesAttribuees)
+            dictResultat[','.join(map(str, sorted(list(map(lambda x: reduce(
+                (lambda y, z: int(y) + (int(z) ** 3.23)), x), possibilite)))))] = possibilite
+            # trouver les solutions avec notes
+            listeSolutionsAvecNotes[str(possibilite)] = notePossibilite(
+                possibilite, listeEleve, notesAttribuees)
 
-
-        nbRep += len(listeSolutions)
+    tabNumEt = list(map(lambda x: list(map(lambda y: tuple(
+        map(lambda z: TAB_ETUDIANTS[int(z)], y)), x)), dictResultat.values()))
 
     meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
 
-
+    if os.path.exists('FMP.csv'):
+        os.remove('FMP.csv')
+    f = open("FMP.csv", "w", newline='')
+    writer = csv.DictWriter(
+        f, fieldnames=[''])
     for possibilite, note in listeSolutionsAvecNotes.items():
-        if(note == meilleurNote):
-            resultat = "{}, note de la repartition : {}".format(possibilite, note)  
-            f = open("FMP.csv", "a")
-            writer = csv.DictWriter(f, fieldnames=[resultat])
-            writer.writeheader()
-            f.close()             
-            
-            
-
- 
-            
-
+        if (note == meilleurNote):
+            # mettre les numéros étudiants
+            tabPos = eval(possibilite.split('~')[0])
+            pos = list(
+                map(lambda y: tuple(map(lambda z: TAB_ETUDIANTS[int(z)], y)), tabPos))
+            writer.writerow({'': pos})
+    f.close()
 
 
 def uneSolution(repartition, listeEleve, solution, listeSolutions):
 
     if(len(repartition) == 0):
-        if(estDoublon(solution,listeSolutions) == False):
-            listeSolutions.append(solution)    # Compte le nb de solutions trouvees
 
-    else :
+        listeSolutions.append(solution)    # Compte le nb de solutions trouvees
+    else:
         tailleGroupe = repartition[0]
         allSet = []
 
@@ -99,7 +105,7 @@ def uneSolution(repartition, listeEleve, solution, listeSolutions):
         diviseur = 0
         if(tailleGroupe == 2):
             diviseur = repartition.count(tailleGroupe)
-        else :
+        else:
             diviseur = 1
 
         for k in range(len(allSet)//diviseur):
@@ -107,42 +113,16 @@ def uneSolution(repartition, listeEleve, solution, listeSolutions):
             solutionTemp = list(solution)
             solutionTemp.append(possibiliteSet)
             listeTemp = list(listeEleve)
-                
+
             for i in range(tailleGroupe):
                 listeTemp.remove(allSet[k][i])
 
             newRepartition = list(repartition)
             del newRepartition[0]
 
-            uneSolution(newRepartition, listeTemp, solutionTemp, listeSolutions)
+            uneSolution(newRepartition, listeTemp,
+                        solutionTemp, listeSolutions)
 
-
-def estDoublon(solution, listeSolutions):
-    if(len(listeSolutions) == 0):
-        return False
-
-    for solutionTest in listeSolutions:
-
-        nb = 0
-
-        i = 0
-        while(i < len(solution)):
-            trouveCorres = False
-            for groupeSolTest in solutionTest:
-                if(solution[i] == groupeSolTest):
-                    nb += 1
-                    trouveCorres = True
-
-            if(trouveCorres == False):
-                break
-
-            i += 1
-
-        if(nb == len(solution)):
-
-            return True
-
-    return False
 
 def notePossibilite(possibilite, listeEleve, notesAttribuees):
     medianeGroupe = []
@@ -150,7 +130,8 @@ def notePossibilite(possibilite, listeEleve, notesAttribuees):
         notesGroupe = []
         for eleve1 in groupe:
             for eleve2 in groupe:
-                note = notesAttribuees[listeEleve.index(eleve1)][listeEleve.index(eleve2)]
+                note = notesAttribuees[listeEleve.index(
+                    eleve1)][listeEleve.index(eleve2)]
                 if(not note == "-"):
                     notesGroupe.append(note)
 
@@ -166,7 +147,7 @@ def notePossibilite(possibilite, listeEleve, notesAttribuees):
             medianeGroupe.append("B")
         elif("TB" in notesGroupe):
             medianeGroupe.append("TB")
-    
+
     if("AR" in medianeGroupe):
         return "AR"
     elif("I" in medianeGroupe):
@@ -201,13 +182,8 @@ def meilleureNoteDesPossibilites(listeSolutionsAvecNotes):
         return "AR"
 
 
-
 #### Programme principale ####
-
 start_time = time.time()
-
-
-
 
 listeEleve = []
 
@@ -216,39 +192,28 @@ listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
 notesAttribuees = []
 
 list2 = []
+TAB_ETUDIANTS = []
 
-
-    
 with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
     i = 0
     row = next(spamreader)
-    n=(len(row[0].split(","))-1)
+    TAB_ETUDIANTS = row[0].split(",")
+    n = (len(row[0].split(",")) - 1)
+    if (n > 12):
+        n = 12
     repartitionPossibles = toutesLesRepartitions(n)
     while(i <= n):
-        if(i != 0):
+        if (i != 0):
             row = next(spamreader)
             notes = []
             liste = row[0].split(",")
-            for k in range(n+1):
-                if(k == 0):
-                    listeEleve.append("e"+str(i))
+            for k in range(n + 1):
+                if (k == 0):
+                    listeEleve.append(str(i))
                 else:
                     notes.append(liste[k])
             notesAttribuees.append(notes)
         i += 1
 
-print()
-print("### Notes attribuées ###")
-for i in notesAttribuees:
-    print(i)
-
-print()
-
-
-
-
 afficherMeilleurGroupes(repartitionPossibles, listeEleve, notesAttribuees)
-
-
-
