@@ -61,16 +61,13 @@ def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
         solution = []
         listeSolutions = []
         uneSolution(repartition, listeEleve, solution, listeSolutions)
-        # mettre toutes les possibilités dans un dictionnaire avec la clé unique pour chaque énumeration
+        # mettre toutes les possibilites dans un dictionnaire avec la cle unique pour chaque enumeration
         for possibilite in listeSolutions:
             dictResultat[','.join(map(str, sorted(list(map(lambda x: reduce(
                 (lambda y, z: int(y) + (int(z) ** 3.23)), x), possibilite)))))] = possibilite
             # trouver les solutions avec notes
             listeSolutionsAvecNotes[str(possibilite)] = notePossibilite(
                 possibilite, listeEleve, notesAttribuees)
-
-    tabNumEt = list(map(lambda x: list(map(lambda y: tuple(
-        map(lambda z: TAB_ETUDIANTS[int(z)], y)), x)), dictResultat.values()))
 
     meilleurNote = meilleureNoteDesPossibilites(listeSolutionsAvecNotes)
 
@@ -81,7 +78,7 @@ def afficherMeilleurGroupes(listePossibilite, listeEleve, notesAttribuees):
         f, fieldnames=[''])
     for possibilite, note in listeSolutionsAvecNotes.items():
         if (note == meilleurNote):
-            # mettre les numéros étudiants
+            # mettre les numeros etudiants
             tabPos = eval(possibilite.split('~')[0])
             pos = list(
                 map(lambda y: tuple(map(lambda z: TAB_ETUDIANTS[int(z)], y)), tabPos))
