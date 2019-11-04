@@ -182,6 +182,12 @@ def meilleureNoteDesPossibilites(listeSolutionsAvecNotes):
 #### Programme principale ####
 start_time = time.time()
 
+ext = ""
+
+for arg in sys.argv:
+    if arg.find("--ext=") != -1:
+        ext = arg[6:]
+
 listeEleve = []
 
 listeNotes = ["TB", "B", "AB", "P", "I", "AR"]
@@ -190,15 +196,15 @@ notesAttribuees = []
 
 TAB_ETUDIANTS = []
 
-with open('../DONNEES/preferencesIG4MD.csv', newline='') as csvfile:
+with open('../DONNEES/'+str(ext), newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
     i = 0
     row = next(spamreader)
     TAB_ETUDIANTS = row[0].split(",")
     n = (len(row[0].split(",")) - 1)
 
-    if (n > 10):
-        n = 10
+    if (n > 11):
+        n = 11
         
     repartitionPossibles = toutesLesRepartitions(n)
     while(i <= n):
